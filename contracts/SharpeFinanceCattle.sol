@@ -3,13 +3,13 @@ pragma solidity ^0.6.12;
 
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 
-contract SharpeBull is ERC721 {
+contract SharpeFinanceCattle is ERC721 {
 
     //const
-    string constant public TOKEN_NAME = "SharpeBull";
-    string constant public TOKEN_SYMBOL = "SB";
+    string constant public TOKEN_NAME = "SharpeFinanceCattle";
+    string constant public TOKEN_SYMBOL = "SFC";
     string constant public TOKEN_BASE_URI = "";
-    uint256 constant public TOTAL_SUPPLY = 3;
+    uint256 constant public MAX_SUPPLY = 10;
 
     //owner tokens map
     mapping(address => uint256[]) public ownerTokensMap;
@@ -38,22 +38,25 @@ contract SharpeBull is ERC721 {
     function mintNft() external {
 
         //unminted token amount
-        uint256 unmintedTokenAmount = TOTAL_SUPPLY - totalSupply();
+        uint256 unmintedTokenAmount = MAX_SUPPLY - totalSupply();
 
         //require amount
         require(unmintedTokenAmount > 0, "All tokens has been minted.");
 
+        //last token
+        uint256 lastToken = unmintedTokenAmount - 1;
+
         //random index
-        uint256 tokenId = _random(unmintedTokenAmount) + 1;
+        uint256 tokenId = _random(unmintedTokenAmount);
 
         //get unminted target token
         uint256 target = unmintedTokenMap[tokenId];
-        uint256 lastTarget = unmintedTokenMap[unmintedTokenAmount];
+        uint256 lastTarget = unmintedTokenMap[lastToken];
 
         //point to target
-        if (tokenId != unmintedTokenAmount) {
+        if (tokenId != lastToken) {
             if (lastTarget == 0) {
-                unmintedTokenMap[tokenId] = unmintedTokenAmount;
+                unmintedTokenMap[tokenId] = lastToken;
             } else {
                 unmintedTokenMap[tokenId] = lastTarget;
             }

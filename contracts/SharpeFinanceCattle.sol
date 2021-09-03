@@ -1,14 +1,16 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.6.12;
 
+import "@openzeppelin/contracts/utils/Context.sol";
+import "@openzeppelin/contracts/access/AccessControl.sol";
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 
-contract SharpeFinanceCattle is ERC721 {
+contract SharpeFinanceCattle is Context, AccessControl, ERC721 {
 
     //const
     string constant public TOKEN_NAME = "SharpeFinanceCattle";
     string constant public TOKEN_SYMBOL = "SFC";
-    string constant public TOKEN_BASE_URI = "";
+    uint256 constant public TOKEN_PRICE = 0.0618 ether;
     uint256 constant public MAX_SUPPLY = 10;
 
     //owner tokens map
@@ -21,7 +23,25 @@ contract SharpeFinanceCattle is ERC721 {
      * constructor
      */
     constructor(string memory baseURI) public ERC721(TOKEN_NAME, TOKEN_SYMBOL) {
+        _setupRole(DEFAULT_ADMIN_ROLE, _msgSender());
         _setBaseURI(baseURI);
+    }
+
+    /**
+     * constructor
+     */
+    function getBalance() public view returns (uint256) {
+        require(hasRole(DEFAULT_ADMIN_ROLE, _msgSender()), "Admin role requested.");
+        return address(this).balance;
+    }
+
+    /**
+     * constructor
+     */
+    function withdraw(uint256 amount) external {
+        require(hasRole(DEFAULT_ADMIN_ROLE, _msgSender()), "Admin role requested.");
+        require(amount <= getBalance(), "Insufficient fund.");
+        _msgSender().transfer(amount);
     }
 
     /**
@@ -33,9 +53,11 @@ contract SharpeFinanceCattle is ERC721 {
     }
 
     /**
-     * mint nft 
+     * mint nft
      */
-    function mintNft() external {
+    function mintNft() external payable {
+
+        require(msg.value == TOKEN_PRICE, "Insufficient fund.");
 
         //unminted token amount
         uint256 unmintedTokenAmount = MAX_SUPPLY - totalSupply();
@@ -68,10 +90,10 @@ contract SharpeFinanceCattle is ERC721 {
         }
 
         //mint nft
-        _mint(msg.sender, tokenId);
+        _mint(_msgSender(), tokenId);
 
         //add to tokens map
-        ownerTokensMap[msg.sender].push(tokenId);
+        ownerTokensMap[_msgSender()].push(tokenId);
 
     }
 
@@ -79,7 +101,7 @@ contract SharpeFinanceCattle is ERC721 {
      * owner token array
      */
     function ownerTokens() external view returns (uint256[] memory){
-        return ownerTokensMap[msg.sender];
+        return ownerTokensMap[_msgSender()];
     }
 
     /**

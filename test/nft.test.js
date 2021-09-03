@@ -12,16 +12,10 @@ contract("SharpeFinanceCattle", async accounts => {
         for (let i = 0; i < supply; i++) {
             let user = accounts[getRandomInt(accounts.length)]
             await this.instance.mintNft({from: user, value: 61800000000000000});
-
-            let ownerTokens = await this.instance.ownerTokens({from: user});
-            let s = toString(ownerTokens);
-            console.log(s)
         }
 
         for (let i = 0; i < accounts.length; i++) {
-            let user = accounts[i];
-            let ownerTokens = await this.instance.ownerTokens({from: user});
-            let s = user + ":::" + ownerTokens
+            let s = accounts[i] + ":::" + await this.instance.balanceOf(accounts[i]);
             console.log(s)
         }
 
@@ -35,15 +29,6 @@ contract("SharpeFinanceCattle", async accounts => {
         console.log("contract balance:::" + balance)
         console.log("balance:::" + await web3.eth.getBalance(accounts[0]));
     });
-
-    function toString(tokens) {
-        let s = "";
-        for (let i = 0; i < tokens.length; i++) {
-            let token = tokens[i];
-            s = s + token.toNumber() + ","
-        }
-        return s
-    }
 
     function getRandomInt(max) {
         return Math.floor(Math.random() * max);

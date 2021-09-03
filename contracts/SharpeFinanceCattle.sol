@@ -11,10 +11,7 @@ contract SharpeFinanceCattle is Context, AccessControl, ERC721 {
     string constant public TOKEN_NAME = "SharpeFinanceCattle";
     string constant public TOKEN_SYMBOL = "SFC";
     uint256 constant public TOKEN_PRICE = 0.0618 ether;
-    uint256 constant public MAX_SUPPLY = 10;
-
-    //owner tokens map
-    mapping(address => uint256[]) public ownerTokensMap;
+    uint256 constant public MAX_SUPPLY = 5000;
 
     //unminted token map
     mapping(uint256 => uint256) public unmintedTokenMap;
@@ -28,7 +25,7 @@ contract SharpeFinanceCattle is Context, AccessControl, ERC721 {
     }
 
     /**
-     * constructor
+     * get balance
      */
     function getBalance() public view returns (uint256) {
         require(hasRole(DEFAULT_ADMIN_ROLE, _msgSender()), "Admin role requested.");
@@ -36,7 +33,7 @@ contract SharpeFinanceCattle is Context, AccessControl, ERC721 {
     }
 
     /**
-     * constructor
+     * withdraw
      */
     function withdraw(uint256 amount) external {
         require(hasRole(DEFAULT_ADMIN_ROLE, _msgSender()), "Admin role requested.");
@@ -57,6 +54,7 @@ contract SharpeFinanceCattle is Context, AccessControl, ERC721 {
      */
     function mintNft() external payable {
 
+        //check value
         require(msg.value == TOKEN_PRICE, "Insufficient fund.");
 
         //unminted token amount
@@ -92,16 +90,6 @@ contract SharpeFinanceCattle is Context, AccessControl, ERC721 {
         //mint nft
         _mint(_msgSender(), tokenId);
 
-        //add to tokens map
-        ownerTokensMap[_msgSender()].push(tokenId);
-
-    }
-
-    /**
-     * owner token array
-     */
-    function ownerTokens() external view returns (uint256[] memory){
-        return ownerTokensMap[_msgSender()];
     }
 
     /**

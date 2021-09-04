@@ -11,10 +11,15 @@ contract SharpeFinanceCattle is Context, AccessControl, ERC721 {
     string constant public TOKEN_NAME = "SharpeFinanceCattle";
     string constant public TOKEN_SYMBOL = "SFC";
     uint256 constant public TOKEN_PRICE = 0.0618 ether;
-    uint256 constant public MAX_SUPPLY = 5000;
+    uint256 constant public MAX_SUPPLY = 10;
+    uint256 constant public MINT_START = 1630728000;
+    uint256 constant public WHITE_LIST_MINT_START = 1630724400;
 
     //unminted token map
     mapping(uint256 => uint256) public unmintedTokenMap;
+
+    //white list map
+    mapping(address => bool) public whiteList;
 
     /**
      * constructor
@@ -22,6 +27,18 @@ contract SharpeFinanceCattle is Context, AccessControl, ERC721 {
     constructor(string memory baseURI) public ERC721(TOKEN_NAME, TOKEN_SYMBOL) {
         _setupRole(DEFAULT_ADMIN_ROLE, _msgSender());
         _setBaseURI(baseURI);
+    }
+
+    /**
+     * add address to white list
+     */
+    function addToWhiteList(address[] memory addressArray) external {
+        require(hasRole(DEFAULT_ADMIN_ROLE, _msgSender()), "Admin role requested.");
+        require(addressArray.length > 0, "Empty address array.");
+        for (uint i = 0; i < addressArray.length; i++) {
+            address addr = addressArray[i];
+            whiteList[addr] = true;
+        }
     }
 
     /**
@@ -63,6 +80,13 @@ contract SharpeFinanceCattle is Context, AccessControl, ERC721 {
         //require amount
         require(unmintedTokenAmount > 0, "All tokens has been minted.");
 
+        //require mint start
+        if (whiteList[_msgSender()]) {
+            require(block.timestamp >= WHITE_LIST_MINT_START, "Mint has not started.");
+        } else {
+            require(block.timestamp >= MINT_START, "Mint has not started.");
+        }
+
         //last token
         uint256 lastToken = unmintedTokenAmount - 1;
 
@@ -90,6 +114,8 @@ contract SharpeFinanceCattle is Context, AccessControl, ERC721 {
         //mint nft
         _mint(_msgSender(), tokenId);
 
+        //update white list
+        whiteList[_msgSender()] = false;
     }
 
     /**

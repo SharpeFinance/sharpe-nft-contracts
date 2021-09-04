@@ -1,5 +1,5 @@
-const SharpeBull = artifacts.require("SharpeBull");
+const SharpeFinanceCattle = artifacts.require("SharpeFinanceCattle");
 
 module.exports = function (deployer) {
-    deployer.deploy(SharpeBull, "");
+    deployer.deploy(SharpeFinanceCattle, "");
 };

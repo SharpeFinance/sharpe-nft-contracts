@@ -3,6 +3,8 @@
   "version": "1.0.0",
   "main": "truffle-config.js",
   "dependencies": {
-    "@openzeppelin/contracts": "^3.1.0"
+    "@openzeppelin/contracts": "^3.1.0",
+    "@truffle/hdwallet-provider": "^1.5.0",
+    "truffle-plugin-verify": "^0.5.14"
   }
 }

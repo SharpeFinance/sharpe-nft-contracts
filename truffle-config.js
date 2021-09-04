@@ -20,9 +20,9 @@
 
 const HDWalletProvider = require('@truffle/hdwallet-provider');
 const fs = require('fs');
-const mnemonic = fs.readFileSync("secret.config").toString().trim();
-const etherscan_api_key = fs.readFileSync("etherscan_api_key.config").toString().trim();
-const infura_project_id = fs.readFileSync("infura_project_id.config").toString().trim();
+const mnemonic = fs.readFileSync("./configs/secret.config").toString().trim();
+const etherscan_api_key = fs.readFileSync("./configs/etherscan_api_key.config").toString().trim();
+const infura_project_id = fs.readFileSync("./configs/infura_project_id.config").toString().trim();
 
 module.exports = {
     /**

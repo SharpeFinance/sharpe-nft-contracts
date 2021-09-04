@@ -1,6 +1,10 @@
+
+#directories
 .idea
 build
 node_modules
 contracts/artifacts
+configs
 
+#files
 package-lock.json

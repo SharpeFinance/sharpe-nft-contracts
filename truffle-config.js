@@ -66,6 +66,13 @@ module.exports = {
             // timeoutBlocks: 200,  // # of blocks before a deployment times out  (minimum/default: 50)
             // skipDryRun: true     // Skip dry run before migrations? (default: false for public nets )
         },
+
+        rinkeby: {
+            provider: () => new HDWalletProvider(mnemonic, `wss://rinkeby.infura.io/ws/v3/` + infura_project_id),
+            network_id: 4,
+            gas: 5500000,
+        },
+
         // Useful for private networks
         // private: {
         // provider: () => new HDWalletProvider(mnemonic, `https://network.io`),

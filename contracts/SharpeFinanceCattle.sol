@@ -11,9 +11,10 @@ contract SharpeFinanceCattle is Context, AccessControl, ERC721 {
     string constant public TOKEN_NAME = "SharpeFinanceCattle";
     string constant public TOKEN_SYMBOL = "SFC";
     uint256 constant public TOKEN_PRICE = 0.0618 ether;
-    uint256 constant public MAX_SUPPLY = 10;
+    uint256 constant public MAX_SUPPLY = 35;
     uint256 constant public MINT_START = 1630728000;
     uint256 constant public WHITE_LIST_MINT_START = 1630724400;
+    address public owner;
 
     //unminted token map
     mapping(uint256 => uint256) public unmintedTokenMap;
@@ -27,6 +28,7 @@ contract SharpeFinanceCattle is Context, AccessControl, ERC721 {
     constructor(string memory baseURI) public ERC721(TOKEN_NAME, TOKEN_SYMBOL) {
         _setupRole(DEFAULT_ADMIN_ROLE, _msgSender());
         _setBaseURI(baseURI);
+        owner = _msgSender();
     }
 
     /**

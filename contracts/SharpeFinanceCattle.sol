@@ -10,7 +10,7 @@ contract SharpeFinanceCattle is Context, AccessControl, ERC721 {
     //const
     string constant public TOKEN_NAME = "SharpeFinanceCattle";
     string constant public TOKEN_SYMBOL = "SFC";
-    uint256 constant public TOKEN_PRICE = 0.0618 ether;
+    uint256 constant public TOKEN_PRICE = 0 ether;
     uint256 constant public MAX_SUPPLY = 35;
     uint256 constant public MINT_START = 1630728000;
     uint256 constant public WHITE_LIST_MINT_START = 1630724400;
@@ -81,6 +81,9 @@ contract SharpeFinanceCattle is Context, AccessControl, ERC721 {
 
         //require amount
         require(unmintedTokenAmount > 0, "All tokens has been minted.");
+
+        //require owner token amount
+        require(balanceOf(_msgSender()) <= 10, "Account reaches max token amount.");
 
         //require mint start
         if (whiteList[_msgSender()]) {

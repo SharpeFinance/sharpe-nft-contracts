@@ -11,16 +11,16 @@ contract SharpeFinanceCattle is Context, AccessControl, ERC721 {
     string constant public TOKEN_NAME = "SharpeFinanceCattle";
     string constant public TOKEN_SYMBOL = "SFC";
     uint256 constant public TOKEN_PRICE = 0 ether;
-    uint256 constant public MAX_SUPPLY = 35;
-    uint256 constant public MINT_START = 1630728000;
-    uint256 constant public WHITE_LIST_MINT_START = 1630724400;
+    uint256 constant public MAX_SUPPLY = 100;
+    uint256 constant public MINT_START = 1631163238;
+    uint256 constant public WHITE_LIST_MINT_START = 1631159638;
     address public owner;
 
     //unminted token map
     mapping(uint256 => uint256) public unmintedTokenMap;
 
     //white list map
-    mapping(address => bool) public whiteList;
+    mapping(address => uint8) public whiteList;
 
     /**
      * constructor
@@ -39,7 +39,7 @@ contract SharpeFinanceCattle is Context, AccessControl, ERC721 {
         require(addressArray.length > 0, "Empty address array.");
         for (uint i = 0; i < addressArray.length; i++) {
             address addr = addressArray[i];
-            whiteList[addr] = true;
+            whiteList[addr] = 5;
         }
     }
 
@@ -54,10 +54,10 @@ contract SharpeFinanceCattle is Context, AccessControl, ERC721 {
     /**
      * withdraw
      */
-    function withdraw(uint256 amount) external {
+    function withdraw() external {
         require(hasRole(DEFAULT_ADMIN_ROLE, _msgSender()), "Admin role requested.");
-        require(amount <= getBalance(), "Insufficient fund.");
-        _msgSender().transfer(amount);
+        require(getBalance() > 0, "Insufficient fund.");
+        _msgSender().transfer(getBalance());
     }
 
     /**
@@ -86,8 +86,9 @@ contract SharpeFinanceCattle is Context, AccessControl, ERC721 {
         require(balanceOf(_msgSender()) <= 10, "Account reaches max token amount.");
 
         //require mint start
-        if (whiteList[_msgSender()]) {
+        if (whiteList[_msgSender()] > 0) {
             require(block.timestamp >= WHITE_LIST_MINT_START, "Mint has not started.");
+            whiteList[_msgSender()]--;
         } else {
             require(block.timestamp >= MINT_START, "Mint has not started.");
         }
@@ -119,8 +120,6 @@ contract SharpeFinanceCattle is Context, AccessControl, ERC721 {
         //mint nft
         _mint(_msgSender(), tokenId);
 
-        //update white list
-        whiteList[_msgSender()] = false;
     }
 
     /**

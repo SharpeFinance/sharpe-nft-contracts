@@ -44,28 +44,12 @@ contract SharpeFinanceCattle is Context, AccessControl, ERC721 {
     }
 
     /**
-     * get balance
-     */
-    function getBalance() public view returns (uint256) {
-        require(hasRole(DEFAULT_ADMIN_ROLE, _msgSender()), "Admin role requested.");
-        return address(this).balance;
-    }
-
-    /**
      * withdraw
      */
     function withdraw() external {
         require(hasRole(DEFAULT_ADMIN_ROLE, _msgSender()), "Admin role requested.");
-        require(getBalance() > 0, "Insufficient fund.");
-        _msgSender().transfer(getBalance());
-    }
-
-    /**
-     * burn nft
-     */
-    function burnNft(uint256 tokenId) external {
-        require(_isApprovedOrOwner(_msgSender(), tokenId), "The caller is not owner nor approved.");
-        _burn(tokenId);
+        require(address(this).balance > 0, "Insufficient fund.");
+        _msgSender().transfer(address(this).balance);
     }
 
     /**

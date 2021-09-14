@@ -60,22 +60,22 @@ contract SharpeFinanceCattle is Context, AccessControl, ERC721 {
         //check value
         require(msg.value == TOKEN_PRICE, "Insufficient fund.");
 
-        //unminted token amount
-        uint256 unmintedTokenAmount = MAX_SUPPLY - totalSupply();
-
         //require amount
-        require(unmintedTokenAmount > 0, "All tokens has been minted.");
+        require(totalSupply() < MAX_SUPPLY, "All tokens has been minted.");
 
         //require owner token amount
-        require(balanceOf(_msgSender()) <= 10, "Account reaches max token amount.");
+        require(balanceOf(_msgSender()) < 10, "Account reaches max token amount.");
 
         //require mint start
-        if (whiteList[_msgSender()] > 0) {
+        if (whiteList[_msgSender()] > 0 && whiteList[_msgSender() <= 5]) {
             require(block.timestamp >= WHITE_LIST_MINT_START, "Mint has not started.");
             whiteList[_msgSender()]--;
         } else {
             require(block.timestamp >= MINT_START, "Mint has not started.");
         }
+
+        //remain
+        uint256 remain = MAX_SUPPLY - totalSupply();
 
         //last token
         uint256 lastToken = unmintedTokenAmount - 1;

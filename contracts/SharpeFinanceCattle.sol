@@ -11,10 +11,11 @@ contract SharpeFinanceCattle is Context, AccessControl, ERC721 {
     string constant public TOKEN_NAME = "SharpeFinanceCattle";
     string constant public TOKEN_SYMBOL = "SFC";
     uint256 constant public TOKEN_PRICE = 0 ether;
-    uint256 constant public MAX_SUPPLY = 100;
+    uint256 constant public MAX_SUPPLY = 4;
     uint256 constant public MINT_START = 1631163238;
     uint256 constant public WHITE_LIST_MINT_START = 1631159638;
     address public owner;
+    bool public mintStart;
 
     //unminted token map
     mapping(uint256 => uint256) public unmintedTokenMap;
@@ -53,9 +54,20 @@ contract SharpeFinanceCattle is Context, AccessControl, ERC721 {
     }
 
     /**
+     * mint start
+     */
+    function startMint() external {
+        require(hasRole(DEFAULT_ADMIN_ROLE, _msgSender()), "Admin role requested.");
+        mintStart = true;
+    }
+
+    /**
      * mint nft
      */
     function mintNft() external payable {
+
+        //check mint start
+        require(mintStart, "Mint has not started.");
 
         //check value
         require(msg.value == TOKEN_PRICE, "Insufficient fund.");
@@ -67,7 +79,7 @@ contract SharpeFinanceCattle is Context, AccessControl, ERC721 {
         require(balanceOf(_msgSender()) < 10, "Account reaches max token amount.");
 
         //require mint start
-        if (whiteList[_msgSender()] > 0 && whiteList[_msgSender() <= 5]) {
+        if (whiteList[_msgSender()] > 0 && whiteList[_msgSender()] <= 5) {
             require(block.timestamp >= WHITE_LIST_MINT_START, "Mint has not started.");
             whiteList[_msgSender()]--;
         } else {
@@ -78,10 +90,10 @@ contract SharpeFinanceCattle is Context, AccessControl, ERC721 {
         uint256 remain = MAX_SUPPLY - totalSupply();
 
         //last token
-        uint256 lastToken = unmintedTokenAmount - 1;
+        uint256 lastToken = remain - 1;
 
         //random index
-        uint256 tokenId = _random(unmintedTokenAmount);
+        uint256 tokenId = _random(remain);
 
         //get unminted target token
         uint256 target = unmintedTokenMap[tokenId];

@@ -11,7 +11,7 @@ contract SharpeFinanceCattle is Context, AccessControl, ERC721 {
     string constant public TOKEN_NAME = "SharpeFinanceCattle";
     string constant public TOKEN_SYMBOL = "SFC";
     uint256 constant public TOKEN_PRICE = 0 ether;
-    uint256 constant public MAX_SUPPLY = 20;
+    uint256 constant public MAX_SUPPLY = 100;
     uint256 public MINT_START = 1631163238;
     uint256 public PRESALE_START = 1631159638;
     address public owner;
@@ -22,6 +22,9 @@ contract SharpeFinanceCattle is Context, AccessControl, ERC721 {
 
     //white list map
     mapping(address => uint8) public whiteList;
+
+    //reward list map
+    mapping(address => bool) public rewardList;
 
     /**
      * constructor
@@ -59,6 +62,18 @@ contract SharpeFinanceCattle is Context, AccessControl, ERC721 {
         for (uint i = 0; i < addrs.length; i++) {
             address addr = addrs[i];
             whiteList[addr] = 5;
+        }
+    }
+
+    /**
+     * add address to reward list
+     */
+    function addToRewardList(address[] memory addrs) external {
+        require(hasRole(DEFAULT_ADMIN_ROLE, _msgSender()), "Admin role requested.");
+        require(addrs.length > 0, "Empty address array.");
+        for (uint i = 0; i < addrs.length; i++) {
+            address addr = addrs[i];
+            rewardList[addr] = true;
         }
     }
 
@@ -114,6 +129,21 @@ contract SharpeFinanceCattle is Context, AccessControl, ERC721 {
 
         //mint nft
         _mintNft(_msgSender());
+    }
+
+    /**
+     * claim reward
+     */
+    function claimReward() external {
+
+        //require reward
+        require(rewardList[_msgSender()], "Reward qualification requested.");
+
+        //mint nft
+        _mintNft(_msgSender());
+
+        //finish reward
+        rewardList[_msgSender()] = false;
     }
 
     /**

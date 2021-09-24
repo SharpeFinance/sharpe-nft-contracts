@@ -11,7 +11,7 @@ contract SharpeFinanceCattle is Context, AccessControl, ERC721 {
     string constant public TOKEN_NAME = "SharpeFinanceCattle";
     string constant public TOKEN_SYMBOL = "SFC";
     uint256 constant public TOKEN_PRICE = 0 ether;
-    uint256 constant public MAX_SUPPLY = 4;
+    uint256 constant public MAX_SUPPLY = 20;
     uint256 public MINT_START = 1631163238;
     uint256 public PRESALE_START = 1631159638;
     address public owner;
@@ -37,6 +37,7 @@ contract SharpeFinanceCattle is Context, AccessControl, ERC721 {
      * set base uri
      */
     function setBaseUri(string memory baseURI) public {
+        require(hasRole(DEFAULT_ADMIN_ROLE, _msgSender()), "Admin role requested.");
         _setBaseURI(baseURI);
     }
 
@@ -44,6 +45,7 @@ contract SharpeFinanceCattle is Context, AccessControl, ERC721 {
      * set start time
      */
     function setStartTime(uint256 mintStart_, uint256 presaleStart_) public {
+        require(hasRole(DEFAULT_ADMIN_ROLE, _msgSender()), "Admin role requested.");
         MINT_START = mintStart_;
         PRESALE_START = presaleStart_;
     }
@@ -51,11 +53,11 @@ contract SharpeFinanceCattle is Context, AccessControl, ERC721 {
     /**
      * add address to white list
      */
-    function addToWhiteList(address[] memory addressArray) external {
+    function addToWhiteList(address[] memory addrs) external {
         require(hasRole(DEFAULT_ADMIN_ROLE, _msgSender()), "Admin role requested.");
-        require(addressArray.length > 0, "Empty address array.");
-        for (uint i = 0; i < addressArray.length; i++) {
-            address addr = addressArray[i];
+        require(addrs.length > 0, "Empty address array.");
+        for (uint i = 0; i < addrs.length; i++) {
+            address addr = addrs[i];
             whiteList[addr] = 5;
         }
     }
@@ -78,6 +80,17 @@ contract SharpeFinanceCattle is Context, AccessControl, ERC721 {
     }
 
     /**
+     * giveaway
+     */
+    function giveaway(address[] memory addrs) external {
+        require(hasRole(DEFAULT_ADMIN_ROLE, _msgSender()), "Admin role requested.");
+        require(addrs.length > 0, "Empty address array.");
+        for (uint i = 0; i < addrs.length; i++) {
+            _mintNft(addrs[i]);
+        }
+    }
+
+    /**
      * mint nft
      */
     function mintNft() external payable {
@@ -87,9 +100,6 @@ contract SharpeFinanceCattle is Context, AccessControl, ERC721 {
 
         //check value
         require(msg.value == TOKEN_PRICE, "Insufficient fund.");
-
-        //require amount
-        require(totalSupply() < MAX_SUPPLY, "All tokens has been minted.");
 
         //require owner token amount
         require(balanceOf(_msgSender()) < 10, "Account reaches max token amount.");
@@ -101,6 +111,18 @@ contract SharpeFinanceCattle is Context, AccessControl, ERC721 {
         } else {
             require(block.timestamp >= MINT_START, "Mint has not started.");
         }
+
+        //mint nft
+        _mintNft(_msgSender());
+    }
+
+    /**
+     * mint nft
+     */
+    function _mintNft(address to_) private {
+
+        //require supply
+        require(totalSupply() < MAX_SUPPLY, "All tokens has been minted.");
 
         //remain
         uint256 remain = MAX_SUPPLY - totalSupply();
@@ -130,8 +152,7 @@ contract SharpeFinanceCattle is Context, AccessControl, ERC721 {
         }
 
         //mint nft
-        _mint(_msgSender(), tokenId);
-
+        _mint(to_, tokenId);
     }
 
     /**

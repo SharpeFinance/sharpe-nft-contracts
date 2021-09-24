@@ -12,8 +12,8 @@ contract SharpeFinanceCattle is Context, AccessControl, ERC721 {
     string constant public TOKEN_SYMBOL = "SFC";
     uint256 constant public TOKEN_PRICE = 0 ether;
     uint256 constant public MAX_SUPPLY = 4;
-    uint256 constant public MINT_START = 1631163238;
-    uint256 constant public WHITE_LIST_MINT_START = 1631159638;
+    uint256 public MINT_START = 1631163238;
+    uint256 public PRESALE_START = 1631159638;
     address public owner;
     bool public mintStart;
 
@@ -26,10 +26,26 @@ contract SharpeFinanceCattle is Context, AccessControl, ERC721 {
     /**
      * constructor
      */
-    constructor(string memory baseURI) public ERC721(TOKEN_NAME, TOKEN_SYMBOL) {
+    constructor(string memory baseURI, uint256 mintStart_, uint256 presaleStart_) public ERC721(TOKEN_NAME, TOKEN_SYMBOL) {
         _setupRole(DEFAULT_ADMIN_ROLE, _msgSender());
-        _setBaseURI(baseURI);
         owner = _msgSender();
+        setBaseUri(baseURI);
+        setStartTime(mintStart_, presaleStart_);
+    }
+
+    /**
+     * set base uri
+     */
+    function setBaseUri(string memory baseURI) public {
+        _setBaseURI(baseURI);
+    }
+
+    /**
+     * set start time
+     */
+    function setStartTime(uint256 mintStart_, uint256 presaleStart_) public {
+        MINT_START = mintStart_;
+        PRESALE_START = presaleStart_;
     }
 
     /**
@@ -80,7 +96,7 @@ contract SharpeFinanceCattle is Context, AccessControl, ERC721 {
 
         //require mint start
         if (whiteList[_msgSender()] > 0 && whiteList[_msgSender()] <= 5) {
-            require(block.timestamp >= WHITE_LIST_MINT_START, "Mint has not started.");
+            require(block.timestamp >= PRESALE_START, "Mint has not started.");
             whiteList[_msgSender()]--;
         } else {
             require(block.timestamp >= MINT_START, "Mint has not started.");

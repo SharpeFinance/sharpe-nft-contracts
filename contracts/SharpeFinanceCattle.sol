@@ -29,12 +29,12 @@ contract SharpeFinanceCattle is Context, AccessControl, ERC721 {
     /**
      * constructor
      */
-    constructor(string memory baseURI, uint256 mintStart_, uint256 presaleStart_) public ERC721(TOKEN_NAME, TOKEN_SYMBOL) {
-        _setupRole(DEFAULT_ADMIN_ROLE, _msgSender());
-        owner = _msgSender();
+    constructor(address admin, string memory baseURI, uint256 mintStart_, uint256 presaleStart_) public ERC721(TOKEN_NAME, TOKEN_SYMBOL) {
+        _setupRole(DEFAULT_ADMIN_ROLE, admin);
+        owner = admin;
         setBaseUri(baseURI);
         setStartTime(mintStart_, presaleStart_);
-        _initMint();
+        _initMint(admin);
     }
 
     /**
@@ -57,9 +57,9 @@ contract SharpeFinanceCattle is Context, AccessControl, ERC721 {
     /**
      * init mint
      */
-    function _initMint() private {
+    function _initMint(address to_) private {
         for (uint i = 0; i < 5; i++) {
-            _mintNft(_msgSender());
+            _mintNft(to_);
         }
     }
 

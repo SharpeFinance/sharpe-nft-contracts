@@ -10,10 +10,10 @@ contract SharpeFinanceCattle is Context, AccessControl, ERC721 {
     //const
     string constant public TOKEN_NAME = "SharpeFinanceCattle";
     string constant public TOKEN_SYMBOL = "SFC";
-    uint256 constant public TOKEN_PRICE = 0 ether;
-    uint256 constant public MAX_SUPPLY = 64;
-    uint256 public MINT_START = 1;
-    uint256 public PRESALE_START = 1;
+    uint256 constant public TOKEN_PRICE = 0.0618 ether;
+    uint256 constant public MAX_SUPPLY = 5005;
+    uint256 public MINT_START;
+    uint256 public PRESALE_START;
     address public owner;
     bool public mintStart;
 

@@ -1,11 +1,10 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.6.12;
 
-import "@openzeppelin/contracts/utils/Context.sol";
-import "@openzeppelin/contracts/access/AccessControl.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 
-contract SharpeFinanceCattle is Context, AccessControl, ERC721 {
+contract SharpeFinanceCattle is Ownable, ERC721 {
 
     //const
     string constant public TOKEN_NAME = "SharpeFinanceCattle";
@@ -14,7 +13,6 @@ contract SharpeFinanceCattle is Context, AccessControl, ERC721 {
     uint256 constant public MAX_SUPPLY = 5005;
     uint256 public MINT_START;
     uint256 public PRESALE_START;
-    address public owner;
     bool public mintStart;
 
     //unminted token map
@@ -29,27 +27,23 @@ contract SharpeFinanceCattle is Context, AccessControl, ERC721 {
     /**
      * constructor
      */
-    constructor(address owner_, string memory baseURI_, uint256 mintStart_, uint256 presaleStart_) public ERC721(TOKEN_NAME, TOKEN_SYMBOL) {
-        _setupRole(DEFAULT_ADMIN_ROLE, owner_);
-        owner = owner_;
+    constructor(string memory baseURI_, uint256 mintStart_, uint256 presaleStart_) public ERC721(TOKEN_NAME, TOKEN_SYMBOL) {
         setBaseUri(baseURI_);
         setStartTime(mintStart_, presaleStart_);
-        _initMint(owner_);
+        _initMint(_msgSender());
     }
 
     /**
      * set base uri
      */
-    function setBaseUri(string memory baseURI_) public {
-        require(hasRole(DEFAULT_ADMIN_ROLE, _msgSender()), "Admin role requested.");
+    function setBaseUri(string memory baseURI_) public onlyOwner {
         _setBaseURI(baseURI_);
     }
 
     /**
      * set start time
      */
-    function setStartTime(uint256 mintStart_, uint256 presaleStart_) public {
-        require(hasRole(DEFAULT_ADMIN_ROLE, _msgSender()), "Admin role requested.");
+    function setStartTime(uint256 mintStart_, uint256 presaleStart_) public onlyOwner {
         MINT_START = mintStart_;
         PRESALE_START = presaleStart_;
     }
@@ -58,16 +52,17 @@ contract SharpeFinanceCattle is Context, AccessControl, ERC721 {
      * init mint
      */
     function _initMint(address to_) private {
-        for (uint i = 0; i < 5; i++) {
-            _mintNft(to_);
-        }
+        _mintFixedNft(to_, 0);
+        _mintFixedNft(to_, 1);
+        _mintFixedNft(to_, 2);
+        _mintFixedNft(to_, 3);
+        _mintFixedNft(to_, 4);
     }
 
     /**
      * add address to white list
      */
-    function addToWhiteList(address[] memory addrs_) external {
-        require(hasRole(DEFAULT_ADMIN_ROLE, _msgSender()), "Admin role requested.");
+    function addToWhiteList(address[] memory addrs_) external onlyOwner {
         require(addrs_.length > 0, "Empty address array.");
         for (uint i = 0; i < addrs_.length; i++) {
             address addr = addrs_[i];
@@ -78,8 +73,7 @@ contract SharpeFinanceCattle is Context, AccessControl, ERC721 {
     /**
      * add address to reward list
      */
-    function addToRewardList(address[] memory addrs_) external {
-        require(hasRole(DEFAULT_ADMIN_ROLE, _msgSender()), "Admin role requested.");
+    function addToRewardList(address[] memory addrs_) external onlyOwner {
         require(addrs_.length > 0, "Empty address array.");
         for (uint i = 0; i < addrs_.length; i++) {
             address addr = addrs_[i];
@@ -90,8 +84,7 @@ contract SharpeFinanceCattle is Context, AccessControl, ERC721 {
     /**
      * withdraw
      */
-    function withdraw() external {
-        require(hasRole(DEFAULT_ADMIN_ROLE, _msgSender()), "Admin role requested.");
+    function withdraw() external onlyOwner {
         require(address(this).balance > 0, "Insufficient fund.");
         _msgSender().transfer(address(this).balance);
     }
@@ -99,8 +92,7 @@ contract SharpeFinanceCattle is Context, AccessControl, ERC721 {
     /**
      * mint start
      */
-    function startMint() external {
-        require(hasRole(DEFAULT_ADMIN_ROLE, _msgSender()), "Admin role requested.");
+    function startMint() external onlyOwner {
         mintStart = true;
     }
 
@@ -143,6 +135,42 @@ contract SharpeFinanceCattle is Context, AccessControl, ERC721 {
 
         //finish reward
         rewardList[_msgSender()] = false;
+    }
+
+    /**
+     * mint nft fixed NFT
+     */
+    function _mintFixedNft(address to_, uint256 tokenId_) private {
+
+        //require supply
+        require(totalSupply() < MAX_SUPPLY, "All tokens has been minted.");
+
+        //remain
+        uint256 remain = MAX_SUPPLY - totalSupply();
+
+        //last token
+        uint256 lastToken = remain - 1;
+
+        //get unminted target token
+        uint256 target = unmintedTokenMap[tokenId_];
+        uint256 lastTarget = unmintedTokenMap[lastToken];
+
+        //point to target
+        if (tokenId_ != lastToken) {
+            if (lastTarget == 0) {
+                unmintedTokenMap[tokenId_] = lastToken;
+            } else {
+                unmintedTokenMap[tokenId_] = lastTarget;
+            }
+        }
+
+        //point to target
+        if (target != 0) {
+            tokenId_ = target;
+        }
+
+        //mint nft
+        _mint(to_, tokenId_);
     }
 
     /**
@@ -197,5 +225,4 @@ contract SharpeFinanceCattle is Context, AccessControl, ERC721 {
         uint256 random = uint256(keccak256(abi.encodePacked(nonce, difficulty, gaslimit, number, timestamp, gasprice))) % randomSize_;
         return random;
     }
-
 }

@@ -5,6 +5,7 @@ build
 node_modules
 contracts/artifacts
 configs
+abi
 
 #files
 package-lock.json

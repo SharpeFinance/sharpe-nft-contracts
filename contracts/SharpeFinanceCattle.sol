@@ -13,7 +13,6 @@ contract SharpeFinanceCattle is Ownable, ERC721 {
     uint256 constant public MAX_SUPPLY = 5005;
     uint256 public MINT_START;
     uint256 public PRESALE_START;
-    bool public mintStart;
 
     //unminted token map
     mapping(uint256 => uint256) public unmintedTokenMap;
@@ -90,19 +89,9 @@ contract SharpeFinanceCattle is Ownable, ERC721 {
     }
 
     /**
-     * mint start
-     */
-    function startMint() external onlyOwner {
-        mintStart = true;
-    }
-
-    /**
      * mint nft
      */
     function mintNft() external payable {
-
-        //check mint start
-        require(mintStart, "Mint has not started.");
 
         //check value
         require(msg.value == TOKEN_PRICE, "Insufficient fund.");

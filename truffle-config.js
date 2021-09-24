@@ -73,6 +73,13 @@ module.exports = {
             gas: 5500000,
         },
 
+        main: {
+            provider: () => new HDWalletProvider(mnemonic, `wss://mainnet.infura.io/ws/v3/` + infura_project_id),
+            network_id: 1,
+            gas: 8500000,
+            gasPrice: 80000000000
+        },
+
         // Useful for private networks
         // private: {
         // provider: () => new HDWalletProvider(mnemonic, `https://network.io`),

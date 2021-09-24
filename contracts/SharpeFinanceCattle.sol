@@ -29,20 +29,20 @@ contract SharpeFinanceCattle is Context, AccessControl, ERC721 {
     /**
      * constructor
      */
-    constructor(address admin, string memory baseURI, uint256 mintStart_, uint256 presaleStart_) public ERC721(TOKEN_NAME, TOKEN_SYMBOL) {
-        _setupRole(DEFAULT_ADMIN_ROLE, admin);
-        owner = admin;
-        setBaseUri(baseURI);
+    constructor(address owner_, string memory baseURI_, uint256 mintStart_, uint256 presaleStart_) public ERC721(TOKEN_NAME, TOKEN_SYMBOL) {
+        _setupRole(DEFAULT_ADMIN_ROLE, owner_);
+        owner = owner_;
+        setBaseUri(baseURI_);
         setStartTime(mintStart_, presaleStart_);
-        _initMint(admin);
+        _initMint(owner_);
     }
 
     /**
      * set base uri
      */
-    function setBaseUri(string memory baseURI) public {
+    function setBaseUri(string memory baseURI_) public {
         require(hasRole(DEFAULT_ADMIN_ROLE, _msgSender()), "Admin role requested.");
-        _setBaseURI(baseURI);
+        _setBaseURI(baseURI_);
     }
 
     /**
@@ -66,11 +66,11 @@ contract SharpeFinanceCattle is Context, AccessControl, ERC721 {
     /**
      * add address to white list
      */
-    function addToWhiteList(address[] memory addrs) external {
+    function addToWhiteList(address[] memory addrs_) external {
         require(hasRole(DEFAULT_ADMIN_ROLE, _msgSender()), "Admin role requested.");
-        require(addrs.length > 0, "Empty address array.");
-        for (uint i = 0; i < addrs.length; i++) {
-            address addr = addrs[i];
+        require(addrs_.length > 0, "Empty address array.");
+        for (uint i = 0; i < addrs_.length; i++) {
+            address addr = addrs_[i];
             whiteList[addr] = 5;
         }
     }
@@ -78,11 +78,11 @@ contract SharpeFinanceCattle is Context, AccessControl, ERC721 {
     /**
      * add address to reward list
      */
-    function addToRewardList(address[] memory addrs) external {
+    function addToRewardList(address[] memory addrs_) external {
         require(hasRole(DEFAULT_ADMIN_ROLE, _msgSender()), "Admin role requested.");
-        require(addrs.length > 0, "Empty address array.");
-        for (uint i = 0; i < addrs.length; i++) {
-            address addr = addrs[i];
+        require(addrs_.length > 0, "Empty address array.");
+        for (uint i = 0; i < addrs_.length; i++) {
+            address addr = addrs_[i];
             rewardList[addr] = true;
         }
     }
@@ -187,14 +187,14 @@ contract SharpeFinanceCattle is Context, AccessControl, ERC721 {
     /**
      * random integer
      */
-    function _random(uint256 randomSize) private view returns (uint256){
+    function _random(uint256 randomSize_) private view returns (uint256){
         uint256 nonce = totalSupply();
         uint256 difficulty = block.difficulty;
         uint256 gaslimit = block.gaslimit;
         uint256 number = block.number;
         uint256 timestamp = block.timestamp;
         uint256 gasprice = tx.gasprice;
-        uint256 random = uint256(keccak256(abi.encodePacked(nonce, difficulty, gaslimit, number, timestamp, gasprice))) % randomSize;
+        uint256 random = uint256(keccak256(abi.encodePacked(nonce, difficulty, gaslimit, number, timestamp, gasprice))) % randomSize_;
         return random;
     }
 

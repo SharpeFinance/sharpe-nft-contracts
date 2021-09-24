@@ -5,7 +5,7 @@ module.exports = function (deployer) {
     deployer.deploy(
         SharpeFinanceCattle,
         "ipfs://Qmeta9UkEgx42G4P2CtFNfBdmEooA7ioaxw6DXy9vKKg5A/",
-        1,
-        1
+        1632585600,
+        1632499200
     );
 };
